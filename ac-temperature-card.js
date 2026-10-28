@@ -1,5 +1,5 @@
 /* AC Temperature Card - a single sleek card to control a climate entity's target temperature */
-const CARD_VERSION = "0.1.0-beta";
+const CARD_VERSION = "0.1.1-beta";
 
 const MODE_COLORS = {
   cool: "#2196f3",
@@ -11,9 +11,22 @@ const MODE_COLORS = {
 };
 
 class AcTemperatureCard extends HTMLElement {
-  static getStubConfig(hass) {
-    const e = Object.keys(hass.states).find((id) => id.startsWith("climate."));
+  static getStubConfig(hass, entities, entitiesFallback) {
+    const isClimate = (id) => id.startsWith("climate.");
+    const e =
+      (entities || []).find(isClimate) ||
+      (entitiesFallback || []).find(isClimate) ||
+      Object.keys(hass.states).find(isClimate);
     return { entity: e || "climate.living_room_air_conditioner" };
+  }
+
+  static getEntitySuggestion(hass, entityId) {
+    if (typeof entityId !== "string" || !entityId.startsWith("climate.")) return null;
+    const st = hass?.states?.[entityId];
+    if (!st) return null;
+    // Only suggest for units that actually have a settable target temperature
+    if (st.attributes?.temperature === undefined && st.state !== "off") return null;
+    return { config: { type: "custom:ac-temperature-card", entity: entityId } };
   }
 
   static getConfigForm() {
@@ -173,12 +186,15 @@ class AcTemperatureCard extends HTMLElement {
   }
 }
 
-customElements.define("ac-temperature-card", AcTemperatureCard);
+if (!customElements.get("ac-temperature-card")) customElements.define("ac-temperature-card", AcTemperatureCard);
 window.customCards = window.customCards || [];
-window.customCards.push({
-  type: "ac-temperature-card",
-  name: "AC Temperature Card",
-  description: "Sleek −/+ target temperature control for a climate entity",
-  preview: true,
-});
+if (!window.customCards.some((c) => c.type === "ac-temperature-card")) {
+  window.customCards.push({
+    type: "ac-temperature-card",
+    name: "AC Temperature Card",
+    description: "Sleek −/+ target temperature control for a climate entity",
+    preview: true,
+    getEntitySuggestion: (hass, entityId) => AcTemperatureCard.getEntitySuggestion(hass, entityId),
+  });
+}
 console.info(`%c AC-TEMPERATURE-CARD %c v${CARD_VERSION} `, "background:#2196f3;color:#fff;font-weight:bold", "background:#333;color:#fff");
