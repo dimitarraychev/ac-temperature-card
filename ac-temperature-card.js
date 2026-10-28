@@ -1,5 +1,5 @@
 /* AC Temperature Card - a single sleek card to control a climate entity's target temperature */
-const CARD_VERSION = "0.1.1-beta";
+const CARD_VERSION = "0.1.2-beta";
 
 const MODE_COLORS = {
   cool: "#2196f3",
@@ -24,7 +24,6 @@ class AcTemperatureCard extends HTMLElement {
     if (typeof entityId !== "string" || !entityId.startsWith("climate.")) return null;
     const st = hass?.states?.[entityId];
     if (!st) return null;
-    // Only suggest for units that actually have a settable target temperature
     if (st.attributes?.temperature === undefined && st.state !== "off") return null;
     return { config: { type: "custom:ac-temperature-card", entity: entityId } };
   }
@@ -59,16 +58,16 @@ class AcTemperatureCard extends HTMLElement {
           :host { display: block; }
           ha-card {
             display: flex; align-items: center; justify-content: space-between;
-            height: 100%; min-height: 84px; padding: 8px 12px; box-sizing: border-box;
+            height: 100%; min-height: 64px; padding: 6px 10px; box-sizing: border-box;
             border: none; overflow: hidden;
             --accent: var(--primary-color);
           }
           button {
             all: unset; box-sizing: border-box; cursor: pointer;
-            width: 56px; height: 56px; border-radius: 50%;
+            width: 44px; height: 44px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             color: var(--secondary-text-color);
-            --mdc-icon-size: 28px;
+            --mdc-icon-size: 24px;
             transition: background-color .2s, color .2s, transform .1s;
             -webkit-tap-highlight-color: transparent;
           }
@@ -82,16 +81,16 @@ class AcTemperatureCard extends HTMLElement {
           }
           .temp { display: flex; align-items: flex-start; line-height: 1; }
           .value {
-            font-size: 2.6rem; font-weight: 300; letter-spacing: -1px;
+            font-size: 2.1rem; font-weight: 300; letter-spacing: -1px;
             color: var(--primary-text-color); transition: color .3s;
             font-variant-numeric: tabular-nums;
           }
           .unit {
-            font-size: 1.1rem; font-weight: 400; margin: 6px 0 0 3px;
+            font-size: 0.95rem; font-weight: 400; margin: 4px 0 0 2px;
             color: var(--accent); opacity: .9;
           }
           .sub {
-            margin-top: 4px; font-size: .75rem; letter-spacing: .5px;
+            margin-top: 2px; font-size: .7rem; letter-spacing: .5px;
             color: var(--secondary-text-color); text-transform: uppercase;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
           }
@@ -152,7 +151,7 @@ class AcTemperatureCard extends HTMLElement {
       this._hass.callService("climate", "set_temperature", { entity_id: this._config.entity, temperature: next });
       clearTimeout(this._release);
       this._release = setTimeout(() => { this._pending = null; this._update(); }, 4000);
-    }, 600); // debounce: rapid taps send one command
+    }, 600);
   }
 
   _update() {
