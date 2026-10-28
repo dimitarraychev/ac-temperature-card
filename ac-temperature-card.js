@@ -1,5 +1,5 @@
 /* AC Temperature Card - a single sleek card to control a climate entity's target temperature */
-const CARD_VERSION = "0.1.0";
+const CARD_VERSION = "0.1.0-beta";
 
 const MODE_COLORS = {
   cool: "#2196f3",
