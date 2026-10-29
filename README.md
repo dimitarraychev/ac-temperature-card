@@ -1,3 +1,10 @@
+> [!IMPORTANT]
+> **This repository is deprecated and no longer maintained.**
+> 
+> The **AC Temperature Card** has been superseded by the new, feature-rich **[AC Control Card](https://github.com/YOUR_USERNAME/ac-control-card)**. All future updates, bug fixes, and improvements will take place there. 
+> 
+> Please migrate your dashboard configuration to the AC Control Card for ongoing support.
+
 # AC Temperature Card
 
 A single, borderless Lovelace card with `−` / `+` buttons and a large centered target temperature for any `climate` entity.
